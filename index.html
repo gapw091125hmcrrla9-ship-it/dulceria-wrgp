@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dulcería Élysée | Panel Administrativo</title>
+  <!-- Fuentes elegantes -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Cormorant+Garamond:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* === VARIABLES Y ESTILOS GLOBALES === */
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #E6C25D;
+      --black: #121212;
+      --white: #FFFFFF;
+      --gray-bg: #F9F9F9;
+      --gray-border: #E5E5E5;
+      --shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--black);
+      background-color: var(--gray-bg);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* === PANTALLA DE LOGIN === */
+    #login-screen {
+      background: linear-gradient(rgba(18, 18, 18, 0.88), rgba(18, 18, 18, 0.92)), 
+                  url('https://images.unsplash.com/photo-1606312619070-d48b4c652a52?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--white);
+      border-radius: 18px;
+      padding: 45px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .brand .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      color: #777;
+      font-style: italic;
+      margin-bottom: 28px;
+      font-size: 16px;
+    }
+
+    .login-card h2 {
+      font-size: 26px;
+      margin-bottom: 30px;
+      color: var(--black);
+    }
+
+    .input-group {
+      position: relative;
+      margin: 22px 0;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 14px;
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--gold);
+    }
+
+    .input-group label {
+      position: absolute;
+      top: 15px;
+      left: 14px;
+      color: #999;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+
+    .input-group input:focus + label,
+    .input-group input:not(:placeholder-shown) + label {
+      top: -19px;
+      left: 10px;
+      font-size: 14px;
+      color: var(--gold);
+      background: var(--white);
+      padding: 0 6px;
+    }
+
+    .btn-login {
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.3s;
+    }
+
+    .btn-login:hover {
+      background: #b89b2f;
+    }
+
+    /* === PANEL DE ADMIN === */
+    #admin-screen {
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: var(--black);
+      color: var(--white);
+      padding: 30px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar-header h1 {
+      color: var(--gold);
+      font-size: 21px;
+      text-align: center;
+      padding: 0 20px;
+      margin-bottom: 35px;
+      letter-spacing: 1px;
+    }
+
+    .nav-btn {
+      display: block;
+      width: calc(100% - 40px);
+      margin: 0 20px 10px;
+      padding: 14px 18px;
+      background: transparent;
+      color: var(--white);
+      border: none;
+      text-align: left;
+      border-radius: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(212, 175, 55, 0.15);
+    }
+
+    .nav-btn.active {
+      background: var(--gold);
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .logout-btn {
+      display: block;
+      width: calc(100% - 40px);
+      margin: 0 20px;
+      padding: 12px;
+      background: transparent;
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+      border-radius: 10px;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    /* Contenido principal */
+    .main-content {
+      flex: 1;
+      padding: 35px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 29px;
+      margin-bottom: 25px;
+      position: relative;
+      padding-bottom: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 65px;
+      height: 3px;
+      background: var(--gold);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Productos */
+    .productos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .producto-card {
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s;
+    }
+
+    .producto-card:hover {
+      transform: translateY(-7px);
+    }
+
+    .producto-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .producto-card h3 {
+      padding: 18px 18px 10px;
+      font-size: 19px;
+    }
+
+    .precio {
+      padding: 0 18px 8px;
+      color: var(--gold);
+      font-size: 21px;
+      font-weight: 600;
+    }
+
+    .stock {
+      padding: 0 18px 18px;
+      color: #666;
+    }
+
+    /* Tablas */
+    .ventas-table-container {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-border);
+    }
+
+    th {
+      color: var(--gold);
+      background: var(--black);
+      font-family: 'Playfair Display', serif;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: rgba(212, 175, 55, 0.04);
+    }
+
+    /* Inventario y otros */
+    .inventario-grid, .reportes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .inventario-item, .reporte-card {
+      background: var(--white);
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .inventario-item h4, .reporte-card h4 {
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .ingresos {
+      font-size: 28px;
+      color: var(--gold);
+      font-weight: 700;
+      margin: 12px 0;
+    }
+
+    .destacado {
+      font-size: 22px;
+      color: var(--gold);
+      margin: 10px 0;
+    }
+
+    /* Configuración */
+    .config-form {
+      max-width: 600px;
+      margin-top: 20px;
+    }
+
+    .config-form label {
+      display: block;
+      margin: 22px 0 10px;
+      font-weight: 600;
+    }
+
+    .config-form input,
+    .config-form select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 16px;
+    }
+
+    .btn-guardar {
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      padding: 13px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .btn-guardar:hover {
+      background: #b89b2f;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #admin-screen {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      .main-content {
+        padding: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pantalla de Inicio de Sesión -->
+  <div id="login-screen" class="screen active">
+    <div class="login-card">
+      <div class="brand">
+        <div class="logo">Dulcería Élysée</div>
+        <p class="tagline">Confitería de Alta Gama</p>
+      </div>
+      <h2>Acceso Administrativo</h2>
+      <form id="login-form">
+        <div class="input-group">
+          <input type="text" id="username" placeholder=" " autocomplete="off" required />
+          <label for="username">Usuario</label>
+        </div>
+        <div class="input-group">
+          <input type="password" id="password" placeholder=" " required />
+          <label for="password">Contraseña</label>
+        </div>
+        <button type="submit" class="btn-login">Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel de Administrador -->
+  <div id="admin-screen" class="screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>Dulcería Élysée</h1>
+      </div>
+      <button class="nav-btn active" data-tab="productos">Productos</button>
+      <button class="nav-btn" data-tab="ventas">Ventas</button>
+      <button class="nav-btn" data-tab="inventario">Inventario</button>
+      <button class="nav-btn" data-tab="reportes">Reportes</button>
+      <button class="nav-btn" data-tab="configuracion">Configuración</button>
+      <button id="logout-btn" class="logout-btn">Cerrar Sesión</button>
+    </aside>
+
+    <!-- Contenido -->
+    <main class="main-content">
+      <!-- Productos -->
+      <div id="productos" class="tab-content active">
+        <h2 class="section-title">Catálogo de Productos</h2>
+        <div class="productos-grid">
+          <div class="producto-card">
+            <img src="img/dulce.jpg" alt="Trufa de Chocolate Negro">
+            <h3>Trufa de Chocolate Negro</h3>
+            <p class="precio">$8.50</p>
+            <p class="stock">Stock: <span>24</span></p>
+          </div>
+          <div class="producto-card">
+            <img src="img/dulce2.jpg" alt="Macaron de Frambuesa">
+            <h3>Macaron de Frambuesa</h3>
+            <p class="precio">$6.00</p>
+            <p class="stock">Stock: <span>18</span></p>
+          </div>
+          <div class="producto-card">
+            <img src="img/dulce3.jpg" alt="Caja Dorada de Caramelos">
+            <h3>Caja Dorada de Caramelos</h3>
+            <p class="precio">$12.00</p>
+            <p class="stock">Stock: <span>10</span></p>
+          </div>
+          <div class="producto-card">
+            <img src="img/dulce4.jpg" alt="Bombón de Azafrán">
+            <h3>Bombón de Azafrán</h3>
+            <p class="precio">$9.75</p>
+            <p class="stock">Stock: <span>15</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ventas -->
+      <div id="ventas" class="tab-content">
+        <h2 class="section-title">Ventas Recientes</h2>
+        <div class="ventas-table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Trufa de Chocolate Negro</td><td>3</td><td>$25.50</td><td>Ana López</td><td>14/10/2025</td></tr>
+              <tr><td>Macaron de Frambuesa</td><td>5</td><td>$30.00</td><td>Carlos Méndez</td><td>14/10/2025</td></tr>
+              <tr><td>Caja Dorada de Caramelos</td><td>2</td><td>$24.00</td><td>Elena Ruiz</td><td>13/10/2025</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Inventario -->
+      <div id="inventario" class="tab-content">
+        <h2 class="section-title">Gestión de Inventario</h2>
+        <div class="inventario-grid">
+          <div class="inventario-item">
+            <h4>Trufa de Chocolate Negro</h4>
+            <p><strong>Stock:</strong> 24 unidades</p>
+            <p><strong>Proveedor:</strong> Chocolats de Paris</p>
+            <p><strong>Última reposición:</strong> 10/10/2025</p>
+          </div>
+          <div class="inventario-item">
+            <h4>Macaron de Frambuesa</h4>
+            <p><strong>Stock:</strong> 18 unidades</p>
+            <p><strong>Proveedor:</strong> Pâtisserie Lumière</p>
+            <p><strong>Última reposición:</strong> 12/10/2025</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reportes -->
+      <div id="reportes" class="tab-content">
+        <h2 class="section-title">Reportes Financieros</h2>
+        <div class="reportes-grid">
+          <div class="reporte-card">
+            <h4>Ingresos Octubre 2025</h4>
+            <p class="ingresos">$1,842.50</p>
+            <p class="tendencia">▲ 12% vs septiembre</p>
+          </div>
+          <div class="reporte-card">
+            <h4>Producto más vendido</h4>
+            <p class="destacado">Macaron de Frambuesa</p>
+            <p>Ventas: 42 unidades</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuración -->
+      <div id="configuracion" class="tab-content">
+        <h2 class="section-title">Configuración de Cuenta</h2>
+        <div class="config-form">
+          <label>Nombre de la tienda</label>
+          <input type="text" value="Dulcería Élysée" disabled>
+          <label>Correo de contacto</label>
+          <input type="email" value="contacto@elysee.com">
+          <label>Moneda</label>
+          <select>
+            <option>USD ($)</option>
+            <option selected>MXN ($)</option>
+            <option>EUR (€)</option>
+          </select>
+          <button class="btn-guardar">Guardar Cambios</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Login
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      if (user === 'william' && pass === '1234') {
+        document.getElementById('login-screen').classList.remove('active');
+        document.getElementById('admin-screen').classList.add('active');
+      } else {
+        alert('❌ Acceso denegado.\nUsuario: incorrecto o\nContraseña:incorrecta');
+      }
+    });
+
+    // Cerrar sesión
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      if (confirm('¿Desea cerrar sesión?')) {
+        document.getElementById('admin-screen').classList.remove('active');
+        document.getElementById('login-screen').classList.add('active');
+        document.getElementById('login-form').reset();
+      }
+    });
+
+    // Cambiar pestañas
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Quitar active de todos
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Activar el seleccionado
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        document.getElementById(tab).classList.add('active');
+      });
+    });
+
+    // Botón guardar (simulado)
+    document.querySelector('.btn-guardar').addEventListener('click', function() {
+      alert('✅ Configuración guardada exitosamente.');
+    });
+  </script>
+</body>
+</html>
